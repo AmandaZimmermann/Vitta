@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Cliente {
     public String profissional, profissionalBanco = "L";
-    String[] resposta = new String[2];
+    String[] resposta = new String[5];
     int idProfissional, idProfissionalBanco = 1, horarioProfissional;
 
     public String[] buscarProfissional(String profissional) {
@@ -31,8 +31,8 @@ public class Cliente {
 
     public String[] agendarConsulta(int idProfissional, int horarioProfissional) {
 
-       resposta[0] = "Consulta agendada para o dia tal com o profussional tal";
+       resposta[0] = "Consulta agendada para o dia ... com o profissional ...";
 
-        return resposta;
+       return resposta;
     }
 }
