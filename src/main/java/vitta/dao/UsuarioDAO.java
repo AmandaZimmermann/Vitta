@@ -1,33 +1,28 @@
 package vitta.dao;
 
-import util.DatabaseUtil;
+import vitta.database.DBUtils;
 import vitta.model.PermissaoTipo;
 import vitta.model.Usuario;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioDAO {
 
     // CRIAR
-    public Usuario criarUsuario(Usuario usuario) throws Exception {
-        String sql = """
-            INSERT INTO usuario (username, senha, permissao, id_pessoa, ativo)
-            VALUES (?, ?, ?, ?, ?)
-            RETURNING id
-        """;
+    public Usuario criarUsuario(Usuario usuario) throws SQLException {
+        String sql  = "INSERT INTO usuario (username, senha, permissao, id_pessoa, ativo) "
+                    + "VALUES (?, ?, ?, ?, ?) RETURNING id";
 
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (ResultSet rs = DBUtils.query(sql,
+                usuario.getUsername(),
+                usuario.getSenha(),
+                usuario.getPermissao().getCodigo(),
+                usuario.getIdPessoa(),
+                usuario.getAtivo())) {
 
-            ps.setString(1, usuario.getUsername());
-            ps.setString(2, usuario.getSenha());
-            ps.setString(3, usuario.getPermissao().getCodigo());
-            ps.setInt(4, usuario.getIdPessoa());
-            ps.setBoolean(5, usuario.getAtivo());
-
-            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 usuario.setId(rs.getInt("id"));
                 return usuario;
@@ -38,15 +33,9 @@ public class UsuarioDAO {
     }
 
     // BUSCAR POR ID
-    public Usuario buscarPorId(int id) throws Exception {
+    public Usuario buscarPorId(int id) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id = ?";
-
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
+        try (ResultSet rs = DBUtils.query(sql, id)) {
             if (rs.next()) {
                 return mapearUsuario(rs);
             } else {
@@ -56,14 +45,11 @@ public class UsuarioDAO {
     }
 
     // LISTAR TODOS
-    public List<Usuario> listarTodos() throws Exception {
+    public List<Usuario> listarTodos() throws SQLException {
         String sql = "SELECT * FROM usuario ORDER BY id";
         List<Usuario> lista = new ArrayList<>();
 
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
+        try (ResultSet rs = DBUtils.query(sql)) {
             while (rs.next()) {
                 lista.add(mapearUsuario(rs));
             }
@@ -72,51 +58,37 @@ public class UsuarioDAO {
     }
 
     // ATUALIZAR
-    public boolean atualizarUsuario(Usuario usuario) throws Exception {
+    public boolean atualizarUsuario(Usuario usuario) throws SQLException {
         if (usuario.getId() == null)
             throw new IllegalArgumentException("ID do usuário é obrigatório para atualização.");
 
-        String sql = """
-            UPDATE usuario
-            SET username = ?, senha = ?, permissao = ?, id_pessoa = ?, ativo = ?
-            WHERE id = ?
-        """;
+        String sql  = "UPDATE usuario "
+                    + "SET username = ?, senha = ?, permissao = ?, id_pessoa = ?, ativo = ? "
+                    + "WHERE id = ?";
 
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        DBUtils.execute(sql,
+                usuario.getUsername(),
+                usuario.getSenha(),
+                usuario.getPermissao().getCodigo(),
+                usuario.getIdPessoa(),
+                usuario.getAtivo(),
+                usuario.getId());
 
-            ps.setString(1, usuario.getUsername());
-            ps.setString(2, usuario.getSenha());
-            ps.setString(3, usuario.getPermissao().getCodigo());
-            ps.setInt(4, usuario.getIdPessoa());
-            ps.setBoolean(5, usuario.getAtivo());
-            ps.setInt(6, usuario.getId());
-
-            return ps.executeUpdate() > 0;
-        }
+        // Retornamos true, pois se não houve exceção, o update ocorreu
+        return true;
     }
 
     // DELETAR
-    public boolean deletarUsuario(int id) throws Exception {
+    public boolean deletarUsuario(int id) throws SQLException {
         String sql = "DELETE FROM usuario WHERE id = ?";
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        }
+        DBUtils.execute(sql, id);
+        return true;
     }
 
     // LOGIN (opcional)
-    public Usuario autenticar(String username, String senha) throws Exception {
+    public Usuario autenticar(String username, String senha) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE username = ? AND senha = ? AND ativo = TRUE";
-
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.setString(2, senha);
-
-            ResultSet rs = ps.executeQuery();
+        try (ResultSet rs = DBUtils.query(sql, username, senha)) {
             if (rs.next()) {
                 return mapearUsuario(rs);
             } else {
@@ -137,4 +109,3 @@ public class UsuarioDAO {
         return u;
     }
 }
-
