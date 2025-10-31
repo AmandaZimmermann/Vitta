@@ -1,4 +1,4 @@
-package dao;
+package vitta.dao;
 
 public class TarjaDAO {
 }

@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 /**
  * Enum que representa o tipo de permissão do usuário

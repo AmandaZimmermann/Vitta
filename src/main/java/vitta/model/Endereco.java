@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 public class Endereco {
     private Integer id;
