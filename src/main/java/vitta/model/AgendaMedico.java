@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 //ESTAVA COMO OPCIONAL NO SCRIPT
 

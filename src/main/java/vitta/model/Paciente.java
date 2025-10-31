@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 public class Paciente {
     private Integer id;

@@ -1,8 +1,8 @@
-package dao;
+package vitta.dao;
 
 import util.DatabaseUtil;
-import model.PermissaoTipo;
-import model.Usuario;
+import vitta.model.PermissaoTipo;
+import vitta.model.Usuario;
 
 import java.sql.*;
 import java.util.ArrayList;

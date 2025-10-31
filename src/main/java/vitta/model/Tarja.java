@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 /**
  * Enum que representa os tipos de tarja de medicamentos

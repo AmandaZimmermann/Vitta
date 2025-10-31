@@ -1,4 +1,4 @@
-package model;
+package vitta.model;
 
 import java.time.LocalDate; // REVER ESSE LOCAL DATE, TALVEZ REMOVER
 
